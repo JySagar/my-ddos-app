@@ -8,11 +8,11 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 # ===============================
 # Load saved models, scaler, label encoder
 # ===============================
-scaler = load("../Output/scaler.joblib")
-rf_model = load("../Output/random_forest_model.joblib")
-lr_model = load("../Output/logistic_regression_model.joblib")
-svm_model = load("../Output/svm_model.joblib")
-label_encoder = load("../Output/label_encoder.joblib")
+scaler = load("scaler.joblib")
+rf_model = load("random_forest_model.joblib")
+lr_model = load("logistic_regression_model.joblib")
+svm_model = load("svm_model.joblib")
+label_encoder = load("label_encoder.joblib")
 
 # Mapping for model selection
 models = {
@@ -50,7 +50,7 @@ if uploaded_file is not None:
         X_input = df.copy()
         y_true_encoded = None
 
-    # Handle Inf/NaN and clip extreme values (matching training preprocessing)
+    # Handle Inf/NaN and clip extreme values
     X_input = X_input.replace([np.inf, -np.inf], np.nan).fillna(0)
     for col in X_input.select_dtypes(include=[np.number]).columns:
         lower = X_input[col].quantile(0.001)
@@ -70,15 +70,14 @@ if uploaded_file is not None:
     st.dataframe(pd.DataFrame({"Prediction": y_pred}))
 
     # ===============================
-    # Show metrics if true labels exist
+    # Show metrics
     # ===============================
     if y_true_encoded is not None:
         st.subheader("Model Metrics")
         acc = accuracy_score(y_true_encoded, y_pred_encoded)
         st.write(f"Accuracy: {acc:.4f}")
 
-        # Option 2: handle missing classes
-        labels_all = list(range(len(label_encoder.classes_)))  # 0..6 for 7 classes
+        labels_all = list(range(len(label_encoder.classes_)))
         report = classification_report(
             y_true_encoded, y_pred_encoded,
             labels=labels_all,
